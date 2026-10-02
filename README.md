@@ -1,79 +1,54 @@
 # platform-auth-signup-func
 
-Independent **Signup Function** for the Platform Auth learning project. Business logic lives in `SignupFunction`, which implements `IFunction<SignupRequest, SignupResponse>`. HTTP (`POST /signup`) is a **local invocation adapter** for the gateway (or a future Function Host)—**not** a public client API.
+Independent **Signup Function** for Platform Auth. HTTP (`POST /signup`) is an **internal invocation adapter** for the gateway only—not a public client API.
 
 ## Client access
 
-**End users and frontends must not call this service directly.** Use the gateway at `http://localhost:5000/auth/signup`. Direct `POST /signup` without the internal invocation header returns **403 Forbidden**.
+**End users and frontends must not call this service directly.** Use the gateway. Direct `POST /signup` without **`X-Internal-Api-Key`** returns **403 Forbidden**.
 
-## What it does
+## Configuration
 
-- Validates signup input (email format, required fields, minimum password length).
-- Executes signup function logic without database, persistence, or password hashing.
-- Returns a non-sensitive success payload demonstrating the function ran.
+### Required
 
-## Architecture
+| Purpose | Environment variable | Nested key |
+|---------|---------------------|------------|
+| Internal API key | `FunctionInvocation__ApiKey` | `FunctionInvocation:ApiKey` |
+
+Startup fails if the API key is missing or empty.
+
+### Optional
+
+| Purpose | Default |
+|---------|---------|
+| Logging levels | Information (see `appsettings.json`) |
+
+### Secrets
+
+- **`FunctionInvocation:ApiKey`** — shared secret with the gateway. Never commit or log.
+
+### Local development
+
+```bash
+dotnet user-secrets set "FunctionInvocation:ApiKey" "<your-local-internal-api-key>"
+dotnet dev-certs https --trust
+dotnet run --launch-profile https
+```
+
+Listens on **`https://localhost:5001`**. HTTP is not enabled in the default launch profile.
+
+### Production
 
 ```text
-HTTP Request (POST /signup)
-        |
-        v
-  HTTP Adapter (Http/SignupHttpAdapter)
-        |
-        v
-  SignupFunction (Functions/SignupFunction)
-        |
-        v
-  SignupResponse
+FunctionInvocation__ApiKey=<secret>
+ASPNETCORE_ENVIRONMENT=Production
 ```
-
-A future Function Host will invoke `SignupFunction` directly without changing business logic.
-
-## Install
-
-```bash
-dotnet restore
-dotnet build
-```
-
-## Run locally
-
-```bash
-dotnet run --launch-profile http
-```
-
-Listens on **http://localhost:5001** (see `Properties/launchSettings.json`).
 
 ## Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/signup` | Gateway-internal invoke (requires `X-Platform-Auth-Internal-Key`) |
-| GET | `/health` | Process liveness |
-
-Configure `FunctionInvocation:ApiKey` (same shared secret as the gateway). Development default is in `appsettings.Development.json`.
-
-### Request (`POST /signup`, gateway only)
-
-```json
-{
-  "email": "test@example.com",
-  "password": "Password123!"
-}
-```
-
-### Success response (`200 OK`)
-
-```json
-{
-  "message": "Signup function executed",
-  "email": "test@example.com"
-}
-```
-
-### Validation error (`400 Bad Request`)
-
-Validation problem details; passwords and secrets are never returned.
+| POST | `/signup` | Internal invoke (requires `X-Internal-Api-Key`) |
+| GET | `/health` | Liveness (no API key required) |
 
 ## Tests
 
@@ -81,6 +56,11 @@ Validation problem details; passwords and secrets are never returned.
 dotnet test tests/Platform.Auth.Signup.Func.Tests/Platform.Auth.Signup.Func.Tests.csproj
 ```
 
-Tests target `SignupFunction` behavior (validation, cancellation), not only HTTP.
+## Build & publish
 
-Standalone repository: no `.sln`, no project references to other Platform Auth components.
+```bash
+dotnet build
+dotnet publish -c Release
+```
+
+Standalone repository: no project references to other Platform Auth components.
