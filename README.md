@@ -37,10 +37,11 @@ C# types: `SignupRequest`, `SignupResponse` in `Contracts/`.
 dotnet run --launch-profile http
 ```
 
-**Local HTTP adapter:** `POST http://localhost:5001/`
+**Local HTTP adapter:** `POST http://localhost:5001/signup`  
+**Liveness:** `GET http://localhost:5001/health`
 
 ```bash
-curl -X POST http://localhost:5001/ -H "Content-Type: application/json" -d "{\"email\":\"test@example.com\",\"password\":\"Password123!\"}"
+curl -X POST http://localhost:5001/signup -H "Content-Type: application/json" -d "{\"email\":\"test@example.com\",\"password\":\"Password123!\"}"
 ```
 
 ## Build
