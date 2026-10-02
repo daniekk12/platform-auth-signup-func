@@ -1,6 +1,10 @@
 # platform-auth-signup-func
 
-Independent **Signup Function** for the Platform Auth learning project. Business logic lives in `SignupFunction`, which implements `IFunction<SignupRequest, SignupResponse>`. HTTP (`POST /signup`) is a **local invocation adapter** only—not the definition of the function.
+Independent **Signup Function** for the Platform Auth learning project. Business logic lives in `SignupFunction`, which implements `IFunction<SignupRequest, SignupResponse>`. HTTP (`POST /signup`) is a **local invocation adapter** for the gateway (or a future Function Host)—**not** a public client API.
+
+## Client access
+
+**End users and frontends must not call this service directly.** Use the gateway at `http://localhost:5000/auth/signup`. Direct `POST /signup` without the internal invocation header returns **403 Forbidden**.
 
 ## What it does
 
@@ -44,10 +48,12 @@ Listens on **http://localhost:5001** (see `Properties/launchSettings.json`).
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/signup` | Invoke signup function |
+| POST | `/signup` | Gateway-internal invoke (requires `X-Platform-Auth-Internal-Key`) |
 | GET | `/health` | Process liveness |
 
-### Request (`POST /signup`)
+Configure `FunctionInvocation:ApiKey` (same shared secret as the gateway). Development default is in `appsettings.Development.json`.
+
+### Request (`POST /signup`, gateway only)
 
 ```json
 {
@@ -68,14 +74,6 @@ Listens on **http://localhost:5001** (see `Properties/launchSettings.json`).
 ### Validation error (`400 Bad Request`)
 
 Validation problem details; passwords and secrets are never returned.
-
-Example:
-
-```bash
-curl -X POST http://localhost:5001/signup \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"test@example.com\",\"password\":\"Password123!\"}"
-```
 
 ## Tests
 
