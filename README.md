@@ -4,7 +4,7 @@ Independent **Signup Function** for the Platform Auth learning project. Business
 
 ## Client access
 
-**End users and frontends must not call this service directly.** Use the gateway at `http://localhost:5000/auth/signup`. Direct `POST /signup` without the internal invocation header returns **403 Forbidden**.
+**End users and frontends must not call this service directly.** Use the gateway at `https://localhost:5000/auth/signup`. Direct `POST /signup` without the internal invocation header returns **403 Forbidden**.
 
 ## What it does
 
@@ -39,10 +39,11 @@ dotnet build
 ## Run locally
 
 ```bash
-dotnet run --launch-profile http
+dotnet dev-certs https --trust
+dotnet run --launch-profile https
 ```
 
-Listens on **http://localhost:5001** (see `Properties/launchSettings.json`).
+Listens on **https://localhost:5001** (see `Properties/launchSettings.json`). HTTP is not enabled in the default launch profile.
 
 ## Endpoints
 
