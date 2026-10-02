@@ -1,9 +1,12 @@
 using Platform.Auth.Signup.Func.Contracts;
 using Platform.Auth.Signup.Func.Extensions;
 using Platform.Auth.Signup.Func.Functions;
+using Platform.Auth.Signup.Func.Hosting;
 using Platform.Auth.Signup.Func.Http;
 using Platform.Auth.Signup.Func.Middleware;
 using Platform.Auth.Signup.Func.Models;
+
+ContainerPortBinding.ApplyIfConfigured();
 
 var builder = WebApplication.CreateBuilder(args);
 
