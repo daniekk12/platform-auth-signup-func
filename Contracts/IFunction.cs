@@ -1,4 +1,4 @@
-namespace Platform.Auth.Signup.Func.Abstractions;
+namespace Platform.Auth.Signup.Func.Contracts;
 
 public interface IFunction<TRequest, TResponse>
 {

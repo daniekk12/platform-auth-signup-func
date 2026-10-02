@@ -1,18 +1,53 @@
 # platform-auth-signup-func
 
-Independent **Signup Function** for the Platform Auth learning project. This is not a traditional signup API: business logic lives in `SignupFunction`, which implements `IFunction<SignupRequest, SignupResponse>`. The HTTP endpoint is a **local invocation adapter** only.
+Independent **Signup Function** for the Platform Auth learning project. Business logic lives in `SignupFunction`, which implements `IFunction<SignupRequest, SignupResponse>`. HTTP (`POST /signup`) is a **local invocation adapter** only—not the definition of the function.
 
-## Architecture role
+## What it does
+
+- Validates signup input (email format, required fields, minimum password length).
+- Executes signup function logic without database, persistence, or password hashing.
+- Returns a non-sensitive success payload demonstrating the function ran.
+
+## Architecture
 
 ```text
-Gateway API  --->  (future Function Host)  --->  Signup Function
+HTTP Request (POST /signup)
+        |
+        v
+  HTTP Adapter (Http/SignupHttpAdapter)
+        |
+        v
+  SignupFunction (Functions/SignupFunction)
+        |
+        v
+  SignupResponse
 ```
 
-Today the Gateway calls this component over HTTP. Later, a local Function Host will discover, start, and invoke functions without changing `SignupFunction`.
+A future Function Host will invoke `SignupFunction` directly without changing business logic.
 
-## Function contract
+## Install
 
-**Input**
+```bash
+dotnet restore
+dotnet build
+```
+
+## Run locally
+
+```bash
+dotnet run --launch-profile http
+```
+
+Listens on **http://localhost:5001** (see `Properties/launchSettings.json`).
+
+## Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/signup` | Invoke signup function |
+| GET | `/health` | Process liveness |
+
+### Request (`POST /signup`)
 
 ```json
 {
@@ -21,33 +56,33 @@ Today the Gateway calls this component over HTTP. Later, a local Function Host w
 }
 ```
 
-**Output**
+### Success response (`200 OK`)
 
 ```json
 {
-  "message": "Signup function executed"
+  "message": "Signup function executed",
+  "email": "test@example.com"
 }
 ```
 
-C# types: `SignupRequest`, `SignupResponse` in `Contracts/`.
+### Validation error (`400 Bad Request`)
 
-## Run locally
+Validation problem details; passwords and secrets are never returned.
 
-```bash
-dotnet run --launch-profile http
-```
-
-**Local HTTP adapter:** `POST http://localhost:5001/signup`  
-**Liveness:** `GET http://localhost:5001/health`
+Example:
 
 ```bash
-curl -X POST http://localhost:5001/signup -H "Content-Type: application/json" -d "{\"email\":\"test@example.com\",\"password\":\"Password123!\"}"
+curl -X POST http://localhost:5001/signup \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"test@example.com\",\"password\":\"Password123!\"}"
 ```
 
-## Build
+## Tests
 
 ```bash
-dotnet build
+dotnet test tests/Platform.Auth.Signup.Func.Tests/Platform.Auth.Signup.Func.Tests.csproj
 ```
 
-This repository is standalone: no `.sln`, no project references to other Platform Auth components.
+Tests target `SignupFunction` behavior (validation, cancellation), not only HTTP.
+
+Standalone repository: no `.sln`, no project references to other Platform Auth components.
