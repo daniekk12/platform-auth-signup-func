@@ -20,6 +20,7 @@ public sealed class InternalInvocationHttpTests : IClassFixture<WebApplicationFa
             new { email = "user@example.com", password = "Password123!" });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.True(response.Headers.CacheControl?.NoStore);
     }
 
     [Fact]
@@ -34,6 +35,7 @@ public sealed class InternalInvocationHttpTests : IClassFixture<WebApplicationFa
             new { email = "user@example.com", password = "Password123!" });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Headers.CacheControl?.NoStore);
     }
 
     [Fact]

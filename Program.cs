@@ -27,8 +27,8 @@ else
 }
 
 app.UseMiddleware<SecurityHeadersMiddleware>();
-app.UseMiddleware<InternalInvocationMiddleware>();
 app.UseMiddleware<FunctionOperationCacheMiddleware>();
+app.UseMiddleware<InternalInvocationMiddleware>();
 
 app.MapSignupHttpAdapter();
 app.MapHealthChecks("/health");
