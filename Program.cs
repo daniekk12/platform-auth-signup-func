@@ -5,12 +5,13 @@ using Platform.Auth.Signup.Func.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<SignupFunction>();
-builder.Services.AddSingleton<IFunction<SignupRequest, SignupResponse>>(sp =>
+builder.Services.AddSingleton<SignupFunction>();builder.Services.AddSingleton<IFunction<SignupRequest, SignupResponse>>(sp =>
     sp.GetRequiredService<SignupFunction>());
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.UseMiddleware<InternalInvocationMiddleware>();
 
 app.MapSignupHttpAdapter();
 app.MapHealthChecks("/health");
