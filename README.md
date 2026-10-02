@@ -81,11 +81,16 @@ Free Web Services **sleep**, **cold start**, and have **limited resources**. Thi
 | Health check | `/health` |
 | Plan | Free |
 
-### Environment variables (Render dashboard)
+### Environment variables (GitHub Actions)
+
+Configure in GitHub, not the Render dashboard. See [`.github/RENDER_GITHUB_CONFIG.md`](.github/RENDER_GITHUB_CONFIG.md).
 
 | Key | Sensitive | Notes |
 |-----|-----------|--------|
+| `RENDER_API_KEY` | Yes | Render API (deploy workflow only) |
 | `FunctionInvocation__ApiKey` | Yes | Same secret as gateway and login |
+| `RENDER_SERVICE_ID` | No | `srv-…` for this service |
+| `PUBLIC_HEALTH_URL` | No | `https://<host>/health` |
 | `AllowedHosts__0` | No | `<your-signup-service>.onrender.com` |
 | `ASPNETCORE_ENVIRONMENT` | No | `Production` |
 
@@ -106,7 +111,7 @@ curl http://localhost:8080/health
 
 ### GitHub → Render
 
-Connect this repo in Render (auto-deploy from `main`) or set `RENDER_DEPLOY_HOOK_URL` for `.github/workflows/render-deploy.yml`. CI: `.github/workflows/ci.yml`.
+**GitHub Actions is the source of truth** for environment variables. See [`.github/RENDER_GITHUB_CONFIG.md`](.github/RENDER_GITHUB_CONFIG.md). CI: `.github/workflows/ci.yml`; deploy: `.github/workflows/render-deploy.yml` (sync env → deploy → health check on `main` only).
 
 ### Verify
 
