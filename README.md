@@ -106,7 +106,7 @@ curl http://localhost:8080/health
 
 ### GitHub → Render
 
-Connect this repo in Render (auto-deploy from `main`) or set `RENDER_DEPLOY_HOOK_URL` for `.github/workflows/render-deploy.yml`. CI: `.github/workflows/ci.yml`.
+**GitHub Actions is the source of truth** for environment variables. See [`.github/RENDER_GITHUB_CONFIG.md`](.github/RENDER_GITHUB_CONFIG.md). CI: `.github/workflows/ci.yml`; deploy: `.github/workflows/render-deploy.yml` (sync env → deploy → health check on `main` only).
 
 ### Verify
 
