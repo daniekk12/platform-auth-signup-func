@@ -8,6 +8,8 @@ builder.Services.AddSingleton<SignupFunction>();
 builder.Services.AddSingleton<IFunction<SignupRequest, SignupResponse>>(sp =>
     sp.GetRequiredService<SignupFunction>());
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 app.MapPost("/signup", async (
@@ -18,5 +20,7 @@ app.MapPost("/signup", async (
     var response = await signupFunction.ExecuteAsync(request, cancellationToken);
     return Results.Ok(response);
 });
+
+app.MapHealthChecks("/health");
 
 app.Run();
